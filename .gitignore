@@ -6,8 +6,31 @@ __pycache__/
 # C extensions
 *.so
 
+# Otther files
+.DS_Store
+.directory
+Banana.app/
+
+# R history files and session data file
+.Rhistory
+.Rapp.history
+.RData
+
+# kiotr and R markdown default cache directories
+*_cache/
+cache/
+
+# TEX files generated from build
+*.aux
+*.blg
+*.lot
+*.lof
+*.idx
+*.toc
+
 # Distribution / packaging
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -23,7 +46,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -45,7 +67,6 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-.pytest_cache/
 
 # Translations
 *.mo
@@ -54,7 +75,6 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
 
 # Flask stuff:
 instance/
@@ -81,14 +101,13 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# dotenv
 .env
+
+# virtualenv
 .venv
-env/
 venv/
 ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
