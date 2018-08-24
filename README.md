@@ -29,9 +29,10 @@ This project requires **Python 3.5** or higher, the Banana Collector Environment
 In a terminal or command window, navigate to the top-level project directory `banana-rl/` (that contains this README) and run the following command:
 
 ```shell
-$ python -m aind.foo
+$ jupyter notebook
 ```
 
+This will open the Jupyter Notebook software and notebook in your browser which you can use to explore and reproduce the experiments that have been run. 
 
 ### References
 1. Schaul, T., Quan, J., Antonoglou, I., & Silver, D. *Prioritized Experience Replay*. arXiv.org, 2015.
