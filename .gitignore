@@ -6,10 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
-# Otther files
+# Other files
 .DS_Store
 .directory
 Banana.app/
+Banana_Linux_NoVis.zip
+Banana_Linux_NoVis/
+nohup.out
 
 # R history files and session data file
 .Rhistory

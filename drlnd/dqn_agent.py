@@ -13,7 +13,7 @@ import numpy as np
 import random
 from collections import namedtuple, deque
 
-from model import QNetwork
+from .model import QNetwork
 
 import torch
 import torch.nn.functional as F
@@ -116,15 +116,8 @@ class DQNAgent():
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones = experiences
-
-        # max_a' \hat{Q}(\phi(s_{t+1}, a'; θ^{-}))
-        # action_values = self.qnet_target(next_states)
-        # max_Qhat = np.max(action_values.cpu().data.numpy(), axis=1).reshape(-1, 1)
-        # y_i = r + γ * maxQhat
-        # y_i = r, if done
-        # Q_target = rewards.cpu() + gamma * max_Qhat * (1 - dones).cpu()
-        # Q(\phi(s_t), a_j; \theta)
-        # Q_expected = self.qnet(states).gather(1, actions).cpu()
+        rewards_ = torch.clamp(rewards, min=-1., max=1.)
+        rewards_ = rewards
 
         # it is optimized to use in gpu
         # Get max predicted Q values (for next states) from target model
@@ -134,9 +127,10 @@ class DQNAgent():
         max_Qhat = self.qnet_target(next_states).detach().max(1)[0].unsqueeze(1)
         # y_i = r + γ * maxQhat
         # y_i = r, if done
-        Q_target = rewards.cpu() + gamma * max_Qhat * (1 - dones).cpu()
+        Q_target = rewards_ + (gamma * max_Qhat * (1 - dones))
+        
         # Q(\phi(s_t), a_j; \theta)
-        Q_expected = self.qnet(states).gather(1, actions).cpu()
+        Q_expected = self.qnet(states).gather(1, actions)
 
         # perform gradient descent step on on (y_i - Q)**2
         loss = F.mse_loss(Q_expected, Q_target)
@@ -191,8 +185,7 @@ class DDQNAgent(DQNAgent):
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones = experiences
-        # rewards_ = torch.clamp(rewards, min=-10., max=10.)
-        rewards_ = rewards
+        rewards_ = torch.clamp(rewards, min=-1., max=1.)
 
         # double DQN changes: arg max_{a} \hat{Q}(s_{t+1}, a, θ_t)
         arg_max_actions = self.qnet(next_states).detach().max(1)[1].unsqueeze(1)
