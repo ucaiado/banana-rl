@@ -85,23 +85,61 @@
 
 % The write up is approximately 1 page (500 words) and includes a summary of the paper (including new techniques introduced), and the key results (if any) that were achieved.
 
-Bla vla. In their paper.
 
-\cite{SchaulQAS15} and \cite{mnih2015humanlevel} and \cite{HasseltGS15}
+According to \cite{spooner2016}, Reinforcement Learning (RL) is an area of machine learning that studies how a learner, called agent, interacts with an environment in order to maximize some notion of cumulative reward. As pointed out by \cite{mnih2015humanlevel}, to use RL successfully in complex environments, with high-dimensional state space, the agent must derive efficient representations of these inputs and use them to generalize past experience to new situations.
 
-As explained in the Deepmind's blog post\footnote{Source: \url{https://deepmind.com/research/alphago/}} about the computer program, due to the enormous search space of Go, traditional AI methods, which construct a search tree over all possible positions, are not suited to this board game. In general, we can reduce the search space in games using two principles: position evaluation and sampling actions from a policy. However, even though the application of both principles has provided superhuman performance in games like backgammon and Scrabble, as explained by Bla, they only produced a weak amateur level play in Go.
+In this project, I trained an agent to navigate in a vast, square world, using Unity Machine Learning Agents Toolkit\footnote{Source: \url{https://github.com/Unity-Technologies/ml-agents}} to design, train, and evaluate different variations of the Deep Reinforcement Learning algorithm. This algorithm was first introduced by \cite{mnih2015humanlevel} and combine RL with a class of artificial neural network known as deep neural network, using it to create a 
+deep \textit{Q}-network $Q(s, a; \;\theta)$, with parameters $\theta$, to generalize its the past observations to new ones. $s$ and $a$ stands for state and action. Some variants of the Deep Q-Learning (DQN) were also evaluated, including Double Deep Q-learing (DDQN) \cite{HasseltGS15} and DDQN with prioritized experience replay \cite{SchaulQAS15}.
+
+The environment used for this project is the Udacity version of the Banana Collector environment, from Unity\footnote{Source: \url{https://youtu.be/heVMs3t9qSk}}. The goal of the agent is to collect as many yellow bananas as possible while avoiding blue bananas. The task is episodic, and to solve the environment, the agent must get an average score of +13 over 100 consecutive episodes.
+
+A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana. The state space has 37 dimensions and contains the agent’s velocity, along with a ray-based perception of objects around agent’s forward direction. Given this information, the agent has to learn how to best select actions. Four discrete actions are available, corresponding to moving forward, backward, turn left and right.
+
+
+The first algorithm tested was the vanilla DQN...
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-24-ddqn-learning-curve.eps}
+\caption{Moving Average of $100$ episodes of the score}
+\label{fig:rwd_funcs}
+\end{figure}
+
+
+The second was the DDQN...
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-24-ddqn-learning-curve.eps}
+\caption{Moving Average of $100$ episodes of the score}
+\label{fig:rwd_funcs}
+\end{figure}
+
+The last one was the DDQN with prioritized experience replay
 
 
 \begin{figure}[ht]
 \centering
-\captionsetup{margin=2cm}
-\includegraphics[width=0.7\textwidth]{../notebooks/figures/reward_comp.eps}
-\caption{Média móvel de $10$ períodos do P\&L do final do episódio, usando diferentes funções de \textit{reward}.}
+\includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-23-ddqnpre-learning-curve.eps}
+\caption{Moving Average of $100$ episodes of the score}
+\label{fig:rwd_funcs}
+\end{figure}
+
+
+and bla bla bla
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-23-final-comparition.eps}
+\caption{Moving Average of $100$ episodes of the score}
 \label{fig:rwd_funcs}
 \end{figure}
 
 
 Similarly to the approach described above, AlphaGo uses two deep convolutional neural networks in the place of the general principles. One neural network, the "value network", predicts how likely a move can lead to a win after a sequence of optimal moves, helping the program reducing the depth of the search. The other neural network, the "policy network", helps reduce the breadth of the search selecting the next move to play. Both neural networks are then combined with an advanced tree search called Monte Carlo Tree Search (MCTS) that effectively selects actions by look-ahead search.
+
+
+
 
 This paper has introduced many different approaches to train the model. First, the policy network was trained directly from expert human moves, using supervised learning. This first stage helped AlphaGo develops its understanding of what reasonable human play looks like. Next, the policy network already trained by supervised learning was improved using reinforcement learning. The system played against different versions of itself, learning from its mistakes. Finally, the value network, which evaluates the value of a position of the program on the board, also was created using reinforcement learning using self-play data set.
 
