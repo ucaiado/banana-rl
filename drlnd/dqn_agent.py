@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Bla bla
+Implement Deep Q-leaning, DDQN and Prioritized experience replay
 
 
 @author: udacity, ucaiado
@@ -30,6 +30,8 @@ GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR = 5e-4               # learning rate
 UPDATE_EVERY = 4        # how often to update the network
+PER_ALPHA = 0.6         # importance sampling exponent
+PER_BETA = 0.4          # prioritization exponent
 
 devc = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -40,7 +42,16 @@ End help functions
 
 
 def weighted_mse_loss(input, target, weights):
-    # source: http://forums.fast.ai/t/how-to-make-a-custom-loss-function-pytorch/9059/20
+    '''
+    Return the weighted mse loss to be used by Prioritized experience replay
+
+    :param input: torch.Tensor.
+    :param target: torch.Tensor.
+    :param weights: torch.Tensor.
+    :return loss:  torch.Tensor.
+    '''
+    # source: http://
+    # forums.fast.ai/t/how-to-make-a-custom-loss-function-pytorch/9059/20
     out = (input-target)**2
     out = out * weights.expand_as(out)
     loss = out.mean(0)  # or sum over whatever dimensions
@@ -48,17 +59,18 @@ def weighted_mse_loss(input, target, weights):
 
 
 class DQNAgent():
-    """Interacts with and learns from the environment."""
+    '''
+    Implementation of a DQN agent that interacts with and learns from the
+    environment
+    '''
 
     def __init__(self, state_size, action_size, seed):
-        """Initialize an DQNAgent object.
+        '''Initialize an DQNAgent object.
 
-        Params
-        ======
-            state_size (int): dimension of each state
-            action_size (int): dimension of each action
-            seed (int): random seed
-        """
+        :param state_size: int. dimension of each state
+        :param action_size: int. dimension of each action
+        :param seed: int. random seed
+        '''
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(seed)
@@ -88,13 +100,11 @@ class DQNAgent():
                 self.learn(experiences, GAMMA)
 
     def act(self, state, eps=0.):
-        """Returns actions for given state as per current policy.
+        '''Returns actions for given state as per current policy.
 
-        Params
-        ======
-            state (array_like): current state
-            eps (float): epsilon, for epsilon-greedy action selection
-        """
+        :param state: array_like. current state
+        :param eps: float. epsilon, for epsilon-greedy action selection
+        '''
         state = torch.from_numpy(state).float().unsqueeze(0).to(devc)
         self.qnet.eval()
         with torch.no_grad():
@@ -108,13 +118,11 @@ class DQNAgent():
             return random.choice(np.arange(self.action_size))
 
     def learn(self, experiences, gamma):
-        """Update value parameters using given batch of experience tuples.
+        '''Update value parameters using given batch of experience tuples.
 
-        Params
-        ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done)
-            gamma (float): discount factor
-        """
+        :param experiences: Tuple[torch.Tensor]. tuple of (s, a, r, s', done)
+        :param gamma: float. discount factor
+        '''
         states, actions, rewards, next_states, dones = experiences
         rewards_ = torch.clamp(rewards, min=-1., max=1.)
         rewards_ = rewards
@@ -128,7 +136,7 @@ class DQNAgent():
         # y_i = r + γ * maxQhat
         # y_i = r, if done
         Q_target = rewards_ + (gamma * max_Qhat * (1 - dones))
-        
+
         # Q(\phi(s_t), a_j; \theta)
         Q_expected = self.qnet(states).gather(1, actions)
 
@@ -142,15 +150,13 @@ class DQNAgent():
         self.soft_update(self.qnet, self.qnet_target, TAU)
 
     def soft_update(self, local_model, target_model, tau):
-        """Soft update model parameters.
+        '''Soft update model parameters.
         θ_target = τ*θ_local + (1 - τ)*θ_target
 
-        Params
-        ======
-            local_model (PyTorch model): weights will be copied from
-            target_model (PyTorch model): weights will be copied to
-            tau (float): interpolation parameter
-        """
+        :param local_model: PyTorch model. weights will be copied from
+        :param target_model: PyTorch model. weights will be copied to
+        :param tau: float. interpolation parameter
+        '''
         iter_params = zip(target_model.parameters(), local_model.parameters())
         for target_param, local_param in iter_params:
             tensor_aux = tau*local_param.data + (1.0-tau)*target_param.data
@@ -158,17 +164,18 @@ class DQNAgent():
 
 
 class DDQNAgent(DQNAgent):
-    """Interacts with and learns from the environment."""
+    '''
+    Implementation of a DDQN agent that interacts with and learns from the
+    environment
+    '''
 
     def __init__(self, state_size, action_size, seed):
-        """Initialize an DoubleDQNAgent object.
+        '''Initialize an DoubleDQNAgent object.
 
-        Params
-        ======
-            state_size (int): dimension of each state
-            action_size (int): dimension of each action
-            seed (int): random seed
-        """
+        :param state_size: int. dimension of each state
+        :param action_size: int. dimension of each action
+        :param seed: int. random seed
+        '''
         super(DDQNAgent, self).__init__(state_size, action_size, seed)
 
         # Replay memory
@@ -177,20 +184,18 @@ class DDQNAgent(DQNAgent):
         self.t_step = 0
 
     def learn(self, experiences, gamma):
-        """Update value parameters using given batch of experience tuples.
+        '''Update value parameters using given batch of experience tuples.
 
-        Params
-        ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done)
-            gamma (float): discount factor
-        """
+        :param experiences: Tuple[torch.Tensor]. tuple of (s, a, r, s', done)
+        :param gamma: float. discount factor
+        '''
         states, actions, rewards, next_states, dones = experiences
         rewards_ = torch.clamp(rewards, min=-1., max=1.)
 
-        # double DQN changes: arg max_{a} \hat{Q}(s_{t+1}, a, θ_t)
-        arg_max_actions = self.qnet(next_states).detach().max(1)[1].unsqueeze(1)
-        # double DQN changes: max_Qhat :=  \hat{Q}(s_{t+1}, arg_max_actions, θ^−)
-        max_Qhat = self.qnet_target(next_states).gather(1, arg_max_actions)
+        # arg max_{a} \hat{Q}(s_{t+1}, a, θ_t)
+        argmax_actions = self.qnet(next_states).detach().max(1)[1].unsqueeze(1)
+        # max_Qhat :=  \hat{Q}(s_{t+1}, argmax_actions, θ^−)
+        max_Qhat = self.qnet_target(next_states).gather(1, argmax_actions)
         # y_i = r + γ * maxQhat
         # y_i = r, if done
         Q_target = rewards_ + (gamma * max_Qhat * (1 - dones))
@@ -208,18 +213,19 @@ class DDQNAgent(DQNAgent):
 
 
 class DDQNPREAgent(DQNAgent):
-    """Interacts with and learns from the environment."""
+    '''
+    Implementation of a DDQN agent that used priritized experience replay and
+    interacts with and learns from the environment
+    '''
 
-    def __init__(self, state_size, action_size, seed, alpha=0.6, max_t=1000,
-                 initial_beta=0.4):
-        """Initialize an DoubleDQNAgent object.
+    def __init__(self, state_size, action_size, seed, alpha=PER_ALPHA,
+                 max_t=1000, initial_beta=PER_BETA):
+        '''Initialize an DDQNPREAgent object.
 
-        Params
-        ======
-            state_size (int): dimension of each state
-            action_size (int): dimension of each action
-            seed (int): random seed
-        """
+        :param state_size: int. dimension of each state
+        :param action_size: int. dimension of each action
+        :param seed: int. random seed
+        '''
         super(DDQNPREAgent, self).__init__(state_size, action_size, seed)
 
         # Replay memory
@@ -242,27 +248,26 @@ class DDQNPREAgent(DQNAgent):
         from its initial value β0 to 1, at the end of learning.
 
         :param t: integer. Current time step in the episode
+        :return current_beta: float. Current exponent beta
         '''
         f_frac = min(float(t) / self.max_t, 1.0)
         current_beta = self.initial_beta + f_frac * (1. - self.initial_beta)
         return current_beta
 
     def learn(self, experiences, gamma, t=1000):
-        """Update value parameters using given batch of experience tuples.
+        '''Update value parameters using given batch of experience tuples.
 
-        Params
-        ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done)
-            gamma (float): discount factor
-        """
+        :param experiences: Tuple[torch.Tensor]. tuple of (s, a, r, s', done)
+        :param gamma: float. discount factor
+        '''
         states, actions, rewards, next_states, dones = experiences
         rewards_ = torch.clamp(rewards, min=-1., max=1.)
         rewards_ = rewards
 
-        # double DQN changes: arg max_{a} \hat{Q}(s_{t+1}, a, θ_t)
-        arg_max_actions = self.qnet(next_states).detach().max(1)[1].unsqueeze(1)
-        # double DQN changes: max_Qhat :=  \hat{Q}(s_{t+1}, arg_max_actions, θ^−)
-        max_Qhat = self.qnet_target(next_states).gather(1, arg_max_actions)
+        # arg max_{a} \hat{Q}(s_{t+1}, a, θ_t)
+        argmax_actions = self.qnet(next_states).detach().max(1)[1].unsqueeze(1)
+        # max_Qhat :=  \hat{Q}(s_{t+1}, argmax_actions, θ^−)
+        max_Qhat = self.qnet_target(next_states).gather(1, argmax_actions)
         # y_i = r + γ * maxQhat
         # y_i = r, if done
         Q_target = rewards_ + (gamma * max_Qhat * (1 - dones))
@@ -290,85 +295,17 @@ class DDQNPREAgent(DQNAgent):
         self.soft_update(self.qnet, self.qnet_target, TAU)
 
 
-class RapheDDQNAgent(DQNAgent):
-    """Interacts with and learns from the environment."""
-
-    def __init__(self, state_size, action_size, seed):
-        """Initialize an RapheDDQNAgent object.
-
-        Params
-        ======
-            state_size (int): dimension of each state
-            action_size (int): dimension of each action
-            seed (int): random seed
-        """
-        super(RapheDDQNAgent, self).__init__(state_size, action_size, seed)
-
-        # optimizers
-        self.optimizer = optim.Adam(self.qnet.parameters(), lr=LR)
-        self.optimizer_trg = optim.Adam(self.qnet_target.parameters(), lr=LR)
-
-        # Replay memory
-        self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
-
-        # Initialize time step (for updating every UPDATE_EVERY steps)
-        self.t_step = 0
-
-    def learn(self, experiences, gamma):
-        """Update value parameters using given batch of experience tuples.
-
-        Params
-        ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done)
-            gamma (float): discount factor
-        """
-        states, actions, rewards, next_states, dones = experiences
-
-        # - Q_target =Qb(next_states(action maxQa))
-        # - Q_expected=Qa(states)
-        # - optimizer_Qa.step
-        # - soft_update(Qa,Qb,tau)
-        Qa = self.qnet
-        Qb = self.qnet_target
-        this_optmz = self.optimizer
-        if random.random() > 0.5:
-            Qa = self.qnet_target
-            Qb = self.qnet
-            this_optmz = self.optimizer_trg
-
-        # double DQN changes: arg max_{a} \hat{Q}(s_{t+1}, a, θ_t)
-        arg_max_actions = Qa(next_states).detach().max(1)[1].unsqueeze(1)
-        # double DQN changes: max_Qhat :=  \hat{Q}(s_{t+1}, arg_max_actions, θ^−)
-        max_Qhat = Qb(next_states).gather(1, arg_max_actions)
-        # y_i = r + γ * maxQhat
-        # y_i = r, if done
-        Q_target = rewards + (gamma * max_Qhat * (1 - dones))
-        # Q(\phi(s_t), a_j; \theta)
-        Q_expected = Qa(states).gather(1, actions)
-
-        # perform gradient descent step on on (y_i - Q)**2
-        loss = F.mse_loss(Q_expected, Q_target)
-        this_optmz.zero_grad()  # Clear the gradients
-        loss.backward()
-        this_optmz.step()
-
-        # ------------------- update target network ------------------- #
-        self.soft_update(Qa, Qb, TAU)
-
-
 class ReplayBuffer(object):
-    """Fixed-size buffer to store experience tuples."""
+    '''Fixed-size buffer to store experience tuples.'''
 
     def __init__(self, action_size, buffer_size, batch_size, seed):
-        """Initialize a ReplayBuffer object.
+        '''Initialize a ReplayBuffer object.
 
-        Params
-        ======
-            action_size (int): dimension of each action
-            buffer_size (int): maximum size of buffer
-            batch_size (int): size of each training batch
-            seed (int): random seed
-        """
+        :param action_size: int. dimension of each action
+        :param buffer_size: int: maximum size of buffer
+        :param batch_size (int): size of each training batch
+        :param seed (int): random seed
+        '''
         self.action_size = action_size
         self.memory = deque(maxlen=buffer_size)
         self.batch_size = batch_size
@@ -378,12 +315,12 @@ class ReplayBuffer(object):
         self.seed = random.seed(seed)
 
     def add(self, state, action, reward, next_state, done):
-        """Add a new experience to memory."""
+        '''Add a new experience to memory.'''
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
 
     def sample(self):
-        """Randomly sample a batch of experiences from memory."""
+        '''Randomly sample a batch of experiences from memory.'''
         experiences = random.sample(self.memory, k=self.batch_size)
 
         states = torch.from_numpy(np.vstack([e.state for e in experiences
@@ -401,24 +338,22 @@ class ReplayBuffer(object):
         return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
-        """Return the current size of internal memory."""
+        '''Return the current size of internal memory.'''
         return len(self.memory)
 
 
 class PrioritizedReplayBuffer(object):
-    """Fixed-size buffer to store experience tuples."""
+    '''Fixed-size buffer to store experience tuples.'''
 
     def __init__(self, action_size, buffer_size, batch_size, seed, alpha):
-        """Initialize a ReplayBuffer object.
+        '''Initialize a ReplayBuffer object.
 
-        Params
-        ======
-            action_size (int): dimension of each action
-            buffer_size (int): maximum size of buffer
-            batch_size (int): size of each training batch
-            seed (int): random seed
-            alpha (float): 0~1 indicating how much prioritization is used
-        """
+        :param action_size: int. dimension of each action
+        :param buffer_size: int: maximum size of buffer
+        :param batch_size: int: size of each training batch
+        :param seed: int: random seed
+        :param alpha: float: 0~1 indicating how much prioritization is used
+        '''
         self.action_size = action_size
         self.memory = deque(maxlen=buffer_size)
         self.batch_size = batch_size
@@ -436,7 +371,7 @@ class PrioritizedReplayBuffer(object):
         self.max_priority = 1.**self.alpha
 
     def add(self, state, action, reward, next_state, done):
-        """Add a new experience to memory."""
+        '''Add a new experience to memory.'''
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
         # exclude the value that will be discareded
@@ -448,7 +383,12 @@ class PrioritizedReplayBuffer(object):
         self.cum_priorities += self.priorities[-1]
 
     def sample(self):
-        """Randomly sample a batch of experiences from memory."""
+        '''
+        Sample a batch of experiences from memory according to importance-
+        sampling weights
+
+        :return. tuple[torch.Tensor]. Sample of past experiences
+        '''
         i_len = len(self.memory)
         na_probs = None
         if self.cum_priorities:
@@ -456,7 +396,6 @@ class PrioritizedReplayBuffer(object):
         l_index = np.random.choice(i_len,
                                    size=min(i_len, self.batch_size),
                                    p=na_probs)
-        # l_index = random.sample(range(len(self.memory)), k=self.batch_size)
         self._indexes = l_index
 
         experiences = [self.memory[ii] for ii in l_index]
@@ -501,7 +440,6 @@ class PrioritizedReplayBuffer(object):
         return torch.tensor(this_weights,
                             device=devc,
                             dtype=torch.float).reshape(-1, 1)
-#         return torch.Tensor(this_weights).reshape(-1, 1).cuda()
 
     def update_priorities(self, td_errors):
         '''
@@ -520,5 +458,5 @@ class PrioritizedReplayBuffer(object):
         self._indexes = []
 
     def __len__(self):
-        """Return the current size of internal memory."""
+        '''Return the current size of internal memory.'''
         return len(self.memory)

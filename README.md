@@ -1,7 +1,7 @@
 Banana RL
 ===========================
 
-In this project, I will train an agent to navigate (and collect bananas!) in a vast, square world. I am going to use the [Unity Machine Learning Agents Toolkit](https://github.com/Unity-Technologies/ml-agents) to design, train, and evaluate my own deep reinforcement learning algorithms implementations.
+In this project, I will train an agent to navigate (and collect bananas!) in a vast, square world. I am going to use the [Unity Machine Learning Agents Toolkit](https://github.com/Unity-Technologies/ml-agents) to design, train, and evaluate my own set of deep reinforcement learning algorithms implementations. I will implement Deep Q-learning (DQN), Double DQN (DDQN) and DDQN with prioritized experience replay.
 
 The environment used for this project is the Udacity version of the Banana Collector environment, from [Unity](https://youtu.be/heVMs3t9qSk). The goal of the agent is to collect as many yellow bananas as possible while avoiding blue bananas.
 
