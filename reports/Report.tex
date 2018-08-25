@@ -24,7 +24,18 @@
 \usepackage[noend]{algpseudocode}
 
 
-
+% Uirá packages
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{booktabs} % To thicken table lines
+\usepackage{graphicx}
+\usepackage{babel,blindtext}
+\usepackage{amsmath}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{epstopdf}
 
 
 
@@ -48,7 +59,7 @@
 
 % enter your details here----------------------------------
 
-\lhead{\normalsize \textrm{Build a Game-Playing Agent - Research Review}}
+\lhead{\normalsize \textrm{Navigation}}
 \chead{}
 \rhead{\normalsize August 23, 2018}
 \lfoot{\normalsize \textrm{DRLND - Udacity}}
@@ -66,7 +77,7 @@
 
 \begin{center}
 
-{\bf \large Bla Bla \\ \small Uirá Caiado}
+{\bf \large {Navigation Using Deep Reinforcement Learning \\ \small Uirá Caiado}}
 \end{center}
 
 
@@ -74,9 +85,21 @@
 
 % The write up is approximately 1 page (500 words) and includes a summary of the paper (including new techniques introduced), and the key results (if any) that were achieved.
 
-Bla vla \cite{Economist2017a}. In their paper "Mastering the Game of Go With Neural Network and Tree Search", \cite{Silver:2016hl} described the technical details of the system.
+Bla vla. In their paper.
 
-As explained in the Deepmind's blog post\footnote{Source: \url{https://deepmind.com/research/alphago/}} about the computer program, due to the enormous search space of Go, traditional AI methods, which construct a search tree over all possible positions, are not suited to this board game. In general, we can reduce the search space in games using two principles: position evaluation and sampling actions from a policy. However, even though the application of both principles has provided superhuman performance in games like backgammon and Scrabble, as explained by \cite{Silver:2016hl}, they only produced a weak amateur level play in Go.
+\cite{SchaulQAS15} and \cite{mnih2015humanlevel} and \cite{HasseltGS15}
+
+As explained in the Deepmind's blog post\footnote{Source: \url{https://deepmind.com/research/alphago/}} about the computer program, due to the enormous search space of Go, traditional AI methods, which construct a search tree over all possible positions, are not suited to this board game. In general, we can reduce the search space in games using two principles: position evaluation and sampling actions from a policy. However, even though the application of both principles has provided superhuman performance in games like backgammon and Scrabble, as explained by Bla, they only produced a weak amateur level play in Go.
+
+
+\begin{figure}[ht]
+\centering
+\captionsetup{margin=2cm}
+\includegraphics[width=0.7\textwidth]{../notebooks/figures/reward_comp.eps}
+\caption{Média móvel de $10$ períodos do P\&L do final do episódio, usando diferentes funções de \textit{reward}.}
+\label{fig:rwd_funcs}
+\end{figure}
+
 
 Similarly to the approach described above, AlphaGo uses two deep convolutional neural networks in the place of the general principles. One neural network, the "value network", predicts how likely a move can lead to a win after a sequence of optimal moves, helping the program reducing the depth of the search. The other neural network, the "policy network", helps reduce the breadth of the search selecting the next move to play. Both neural networks are then combined with an advanced tree search called Monte Carlo Tree Search (MCTS) that effectively selects actions by look-ahead search.
 
