@@ -100,9 +100,9 @@ The first algorithm tested was the vanilla DQN...
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-24-ddqn-learning-curve.eps}
+\includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-24-dqn.eps}
 \caption{Moving Average of $100$ episodes of the score}
-\label{fig:rwd_funcs}
+\label{fig:dqn}
 \end{figure}
 
 
@@ -112,17 +112,18 @@ The second was the DDQN...
 \centering
 \includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-24-ddqn-learning-curve.eps}
 \caption{Moving Average of $100$ episodes of the score}
-\label{fig:rwd_funcs}
+\label{fig:ddqn}
 \end{figure}
 
 The last one was the DDQN with prioritized experience replay
 
+bla the figure \ref{fig:ddqnper}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-23-ddqnpre-learning-curve.eps}
 \caption{Moving Average of $100$ episodes of the score}
-\label{fig:rwd_funcs}
+\label{fig:ddqnper}
 \end{figure}
 
 
@@ -132,18 +133,11 @@ and bla bla bla
 \centering
 \includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-23-final-comparition-2.eps}
 \caption{Moving Average of $100$ episodes of the score}
-\label{fig:rwd_funcs}
+\label{fig:final_comp}
 \end{figure}
 
 
-Similarly to the approach described above, AlphaGo uses two deep convolutional neural networks in the place of the general principles. One neural network, the "value network", predicts how likely a move can lead to a win after a sequence of optimal moves, helping the program reducing the depth of the search. The other neural network, the "policy network", helps reduce the breadth of the search selecting the next move to play. Both neural networks are then combined with an advanced tree search called Monte Carlo Tree Search (MCTS) that effectively selects actions by look-ahead search.
-
-
-
-
-This paper has introduced many different approaches to train the model. First, the policy network was trained directly from expert human moves, using supervised learning. This first stage helped AlphaGo develops its understanding of what reasonable human play looks like. Next, the policy network already trained by supervised learning was improved using reinforcement learning. The system played against different versions of itself, learning from its mistakes. Finally, the value network, which evaluates the value of a position of the program on the board, also was created using reinforcement learning using self-play data set.
-
-After combining the policy and value network with MCTS, the paper reports that the program achieved 99.8\% winning rate against other Go programs, and defeated the human European Go champion by five games to 0. AlphaGo is based on deep neural networks that are trained by a combination of supervised and reinforcement learning, avoiding the construction of handcrafted evaluation function, as was did for DeepBlue, for example. The search algorithm developed to the program could be applied to other domains, as general game-playing, scheduling, and constraint satisfaction.
+Finally, as possible extensions ...
 
 
 
