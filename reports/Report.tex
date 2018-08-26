@@ -83,12 +83,13 @@
 
 %---------------- start of document body------------------
 
-% The write up is approximately 1 page (500 words) and includes a summary of the paper (including new techniques introduced), and the key results (if any) that were achieved.
+% The report clearly describes the learning algorithm, along with the chosen hyperparameters. It also describes the model architectures for any neural networks.
 
+% A plot of rewards per episode is included to illustrate that the agent is able to receive an average reward (over 100 episodes) of at least +13. The submission reports the number of episodes needed to solve the environment.
 
 According to \cite{spooner2016}, Reinforcement Learning (RL) is an area of machine learning that studies how a learner, called agent, interacts with an environment in order to maximize some notion of cumulative reward. As pointed out by \cite{mnih2015humanlevel}, to use RL successfully in complex environments, with high-dimensional state space, the agent must derive efficient representations of these inputs and use them to generalize past experience to new situations.
 
-In this project, I trained an agent to navigate in a vast, square world, using Unity Machine Learning Agents Toolkit\footnote{Source: \url{https://github.com/Unity-Technologies/ml-agents}} to design, train, and evaluate different variations of the Deep Reinforcement Learning algorithm. This algorithm was first introduced by \cite{mnih2015humanlevel} and combine RL with a class of artificial neural network known as deep neural network, using it to create a 
+In this project, I trained an agent to navigate in a vast, square world, using Unity Machine Learning Agents Toolkit\footnote{Source: \url{https://github.com/Unity-Technologies/ml-agents}} to design, train, and evaluate different variations of the Deep Reinforcement Learning algorithm. This algorithm was first introduced by \cite{mnih2015humanlevel} and combine RL with a class of artificial neural network known as deep neural network, using it to create a
 deep \textit{Q}-network $Q(s, a; \;\theta)$, with parameters $\theta$, to generalize its the past observations to new ones. $s$ and $a$ stands for state and action. Some variants of the Deep Q-Learning (DQN) were also evaluated, including Double Deep Q-learing (DDQN) \cite{HasseltGS15} and DDQN with prioritized experience replay \cite{SchaulQAS15}.
 
 The environment used for this project is the Udacity version of the Banana Collector environment, from Unity\footnote{Source: \url{https://youtu.be/heVMs3t9qSk}}. The goal of the agent is to collect as many yellow bananas as possible while avoiding blue bananas. The task is episodic, and to solve the environment, the agent must get an average score of +13 over 100 consecutive episodes.
@@ -128,6 +129,17 @@ bla the figure \ref{fig:ddqnper}
 
 
 and bla bla bla
+
+\begin{tabular}{lrrr}
+\toprule
+{} &  episodes &  mean\_score &  std\_score \\
+model         &           &             &            \\
+\midrule
+DDQN with PER &       562 &       13.06 &   3.466468 \\
+DDQN          &       462 &       13.01 &   3.479928 \\
+DQN           &       529 &       13.01 &   3.421973 \\
+\bottomrule
+\end{tabular}
 
 \begin{figure}[ht]
 \centering
