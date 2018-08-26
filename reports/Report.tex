@@ -95,8 +95,14 @@ The environment used for this project is the Udacity version of the Banana Colle
 
 A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana. The state space has 37 dimensions and contains the agent’s velocity, along with a ray-based perception of objects around agent’s forward direction. Given this information, the agent has to learn how to best select actions. Four discrete actions are available, corresponding to moving forward, backward, turn left and right.
 
+% describes the model architectures for any neural networks
+All the algorithms implemented in this project used the following architecture to the deep \textit{Q}-networks used. The input to the neural networks consists of an vector $37 \times 1$ produced by the environment. The input layer is a fully-connected linear layer with $128$ neurons and applies a rectifier nonlinearity. It is followed by a hidden layer also consisting of a fully-connected linear layer with $128$ neurons followed by a rectifier nonlinearity;
 
-The first algorithm tested was the vanilla DQN...
+
+
+
+% (1) describes the learning algorithm, along with the chosen hyperparameters
+The first algorithm tested was the vanilla DQN. 
 
 \begin{figure}[ht]
 \centering
@@ -106,6 +112,7 @@ The first algorithm tested was the vanilla DQN...
 \end{figure}
 
 
+% (2) describes the learning algorithm, along with the chosen hyperparameters
 The second was the DDQN...
 
 \begin{figure}[ht]
@@ -115,10 +122,13 @@ The second was the DDQN...
 \label{fig:ddqn}
 \end{figure}
 
+% (3) describes the learning algorithm, along with the chosen hyperparameters
 The last one was the DDQN with prioritized experience replay
 
 bla the figure \ref{fig:ddqnper}
 
+
+% A plot of rewards per episode is included to illustrate that the agent is able to receive an average reward (over 100 episodes) of at least +13
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-23-ddqnpre-learning-curve.eps}
@@ -129,6 +139,21 @@ bla the figure \ref{fig:ddqnper}
 
 and bla bla bla
 
+ % The submission reports the number of episodes needed to solve the environment. 
+ 
+\begin{table}[ht!]
+\centering
+\begin{tabular}{lrrr}
+{model} &  episodes &  mean score $\pm \;\sigma$ \\
+\midrule
+DDQN with PER &       562 &       $13.06\pm3.47$ \\
+DDQN          &       462 &       $13.01\pm3.48$ \\
+DQN           &       529 &       $13.01\pm3.42$ \\
+
+\end{tabular}
+\caption{\label{tab:final_results}Summary of the tests.}
+\end{table}
+
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.7\textwidth]{../notebooks/figures/2018-08-23-final-comparition-2.eps}
@@ -136,7 +161,7 @@ and bla bla bla
 \label{fig:final_comp}
 \end{figure}
 
-
+% The submission has concrete future ideas for improving the agent's performance.
 Finally, as possible extensions ...
 
 
